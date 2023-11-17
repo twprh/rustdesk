@@ -14,13 +14,13 @@ on:
     paths-ignore:
       - "docs/**"
       - "README.md"
-  push:
-    branches:
-      - master
-    paths-ignore:
-      - ".github/**"
-      - "docs/**"
-      - "README.md"
+ # push:
+ #   branches:
+ #     - master
+ #   paths-ignore:
+ #     - ".github/**"
+ #     - "docs/**"
+ #     - "README.md"
 
 jobs:
   # ensure_cargo_fmt:
