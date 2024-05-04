@@ -101,8 +101,8 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
-pub const PUBLIC_RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
+pub const RENDEZVOUS_SERVERS: &[&str] = &["rustdesk.twp.dedyn.io"];
+pub const PUBLIC_RS_PUB_KEY: &str = "NWtk1Q2r6TwIJiScBMnbIWVIkaGG388Tcsoys7YgrGc=";
 
 pub const RS_PUB_KEY: &str = match option_env!("RS_PUB_KEY") {
     Some(key) if !key.is_empty() => key,
@@ -430,6 +430,8 @@ fn patch(path: PathBuf) -> PathBuf {
 impl Config2 {
     fn load() -> Config2 {
         let mut config = Config::load_::<Config2>("2");
+        config.options.insert("key".to_string(), RS_PUB_KEY.to_string());
+        config.options.insert("custom-rendezvous-server".to_string(), "rustdesk.twp.dedyn.io".to_string());
         if let Some(mut socks) = config.socks {
             let (password, _, store) =
                 decrypt_str_or_original(&socks.password, PASSWORD_ENC_VERSION);
