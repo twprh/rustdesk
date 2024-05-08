@@ -1093,43 +1093,14 @@ jobs:
         run: |
           sed -i "s/x86_64/${{ matrix.job.arch }}/g" res/PKGBUILD
           if [[ "${{ matrix.job.arch }}" == "aarch64" ]]; then
-            sed -i "s/linux\/x64/linux\/arm64/g" ./res/PKGBUILD
+            sed -i "s/x86_64/aarch64/g" ./res/PKGBUILD
           fi
 
       - name: Build archlinux package
         if: matrix.job.arch == 'x86_64' && env.UPLOAD_ARTIFACT == 'true'
         uses: rustdesk-org/arch-makepkg-action@master
         with:
-          packages: >
-            llvm
-            clang
-            libva
-            libvdpau
-            rust
-            gstreamer
-            unzip
-            git
-            cmake
-            gcc
-            curl
-            wget
-            nasm
-            zip
-            make
-            pkg-config
-            clang
-            gtk3
-            xdotool
-            libxcb
-            libxfixes
-            alsa-lib
-            pipewire
-            python
-            ttf-arphic-uming
-            libappindicator-gtk3
-            pam
-            gst-plugins-base
-            gst-plugin-pipewire
+          packages:
           scripts: |
             cd res && HBB=`pwd`/.. FLUTTER=1 makepkg -f
 
@@ -1167,7 +1138,7 @@ jobs:
 
       - name: Rename Binary
         run: |
-          mv rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.deb rustdesk-${{ env.VERSION }}.deb
+          mv rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.deb appimage/rustdesk.deb
 
       - name: Build appimage package
         shell: bash
@@ -1221,11 +1192,11 @@ jobs:
 
       - name: Rename Binary
         run: |
-          mv rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.deb rustdesk-${{ env.VERSION }}.deb
+          mv rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.deb flatpak/rustdesk.deb
 
       - uses: rustdesk-org/run-on-arch-action@amd64-support
         name: Build rustdesk flatpak package for ${{ matrix.job.arch }}
-        id: rpm
+        id: flatpak
         with:
           arch: ${{ matrix.job.arch }}
           distro: ${{ matrix.job.distro }}
