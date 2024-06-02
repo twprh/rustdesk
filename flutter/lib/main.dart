@@ -95,6 +95,7 @@ Future<void> main(List<String> args) async {
     desktopType = DesktopType.main;
     await windowManager.ensureInitialized();
     windowManager.setPreventClose(true);
+    windowManager.setMovable(false);
     runMainApp(true);
   }
 }
@@ -167,6 +168,7 @@ void runMultiWindow(
   final title = getWindowName();
   // set prevent close to true, we handle close event manually
   WindowController.fromWindowId(kWindowId!).setPreventClose(true);
+  WindowController.fromWindowId(kWindowId!).setMovable(false);
   late Widget widget;
   switch (appType) {
     case kAppTypeDesktopRemote:
@@ -338,7 +340,6 @@ void runInstallPage() async {
     windowManager.focus();
     windowManager.setOpacity(1);
     windowManager.setAlignment(Alignment.center); // ensure
-    windowManager.setTitle(getWindowName());
   });
 }
 
