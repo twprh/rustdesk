@@ -914,7 +914,7 @@ impl Config {
 
     #[inline]
     fn purify_options(v: &mut HashMap<String, String>) {
-        v.retain(|k, _| is_option_can_save(&OVERWRITE_SETTINGS, k));
+        v.retain(|k, v| is_option_can_save(&OVERWRITE_SETTINGS, k, &DEFAULT_SETTINGS, v));
     }
 
     pub fn set_options(mut v: HashMap<String, String>) {
@@ -938,7 +938,7 @@ impl Config {
     }
 
     pub fn set_option(k: String, v: String) {
-        if !is_option_can_save(&OVERWRITE_SETTINGS, &k) {
+        if !is_option_can_save(&OVERWRITE_SETTINGS, &k, &DEFAULT_SETTINGS, &v) {
             return;
         }
         let mut config = CONFIG2.write().unwrap();
@@ -1451,7 +1451,7 @@ impl LocalConfig {
     }
 
     pub fn set_option(k: String, v: String) {
-        if !is_option_can_save(&OVERWRITE_LOCAL_SETTINGS, &k) {
+        if !is_option_can_save(&OVERWRITE_LOCAL_SETTINGS, &k, &DEFAULT_LOCAL_SETTINGS, &v) {
             return;
         }
         let mut config = LOCAL_CONFIG.write().unwrap();
@@ -1638,7 +1638,12 @@ impl UserDefaultConfig {
     }
 
     pub fn set(&mut self, key: String, value: String) {
-        if !is_option_can_save(&OVERWRITE_DISPLAY_SETTINGS, &key) {
+        if !is_option_can_save(
+            &OVERWRITE_DISPLAY_SETTINGS,
+            &key,
+            &DEFAULT_DISPLAY_SETTINGS,
+            &value,
+        ) {
             return;
         }
         if value.is_empty() {
@@ -1961,8 +1966,15 @@ fn get_or(
 }
 
 #[inline]
-fn is_option_can_save(overwrite: &RwLock<HashMap<String, String>>, k: &str) -> bool {
-    if overwrite.read().unwrap().contains_key(k) {
+fn is_option_can_save(
+    overwrite: &RwLock<HashMap<String, String>>,
+    k: &str,
+    defaults: &RwLock<HashMap<String, String>>,
+    v: &str,
+) -> bool {
+    if overwrite.read().unwrap().contains_key(k)
+        || defaults.read().unwrap().get(k).map_or(false, |x| x == v)
+    {
         return false;
     }
     true
@@ -2102,6 +2114,11 @@ pub mod keys {
     pub const OPTION_ALLOW_LINUX_HEADLESS: &str = "allow-linux-headless";
     pub const OPTION_ENABLE_HWCODEC: &str = "enable-hwcodec";
     pub const OPTION_APPROVE_MODE: &str = "approve-mode";
+    pub const OPTION_CUSTOM_RENDEZVOUS_SERVER: &str = "custom-rendezvous-server";
+    pub const OPTION_API_SERVER: &str = "api-server";
+    pub const OPTION_KEY: &str = "key";
+    pub const OPTION_PRESET_ADDRESS_BOOK_NAME: &str = "preset-address-book-name";
+    pub const OPTION_PRESET_ADDRESS_BOOK_TAG: &str = "preset-address-book-tag";
 
     // flutter local options
     pub const OPTION_FLUTTER_REMOTE_MENUBAR_STATE: &str = "remoteMenubarState";
@@ -2118,6 +2135,9 @@ pub mod keys {
     pub const OPTION_FLOATING_WINDOW_UNTOUCHABLE: &str = "floating-window-untouchable";
     pub const OPTION_FLOATING_WINDOW_TRANSPARENCY: &str = "floating-window-transparency";
     pub const OPTION_FLOATING_WINDOW_SVG: &str = "floating-window-svg";
+
+    pub const OPTION_DISABLE_GROUP_PANEL: &str = "disable-group-panel";
+    pub const OPTION_PRE_ELEVATE_SERVICE: &str = "pre-elevate-service";
 
     // proxy settings
     // The following options are not real keys, they are just used for custom client advanced settings.
@@ -2179,6 +2199,8 @@ pub mod keys {
         OPTION_FLOATING_WINDOW_UNTOUCHABLE,
         OPTION_FLOATING_WINDOW_TRANSPARENCY,
         OPTION_FLOATING_WINDOW_SVG,
+        OPTION_DISABLE_GROUP_PANEL,
+        OPTION_PRE_ELEVATE_SERVICE,
     ];
     // DEFAULT_SETTINGS, OVERWRITE_SETTINGS
     pub const KEYS_SETTINGS: &[&str] = &[
@@ -2210,6 +2232,11 @@ pub mod keys {
         OPTION_PROXY_URL,
         OPTION_PROXY_USERNAME,
         OPTION_PROXY_PASSWORD,
+        OPTION_CUSTOM_RENDEZVOUS_SERVER,
+        OPTION_API_SERVER,
+        OPTION_KEY,
+        OPTION_PRESET_ADDRESS_BOOK_NAME,
+        OPTION_PRESET_ADDRESS_BOOK_TAG,
     ];
 }
 
@@ -2285,7 +2312,18 @@ mod tests {
         res.insert("c".to_owned(), "d".to_string());
         res.insert("d".to_owned(), "cc".to_string());
         Config::purify_options(&mut res);
+        DEFAULT_SETTINGS
+            .write()
+            .unwrap()
+            .insert("f".to_string(), "c".to_string());
+        Config::purify_options(&mut res);
         assert!(res.len() == 2);
+        DEFAULT_SETTINGS
+            .write()
+            .unwrap()
+            .insert("f".to_string(), "a".to_string());
+        Config::purify_options(&mut res);
+        assert!(res.len() == 1);
         let res = Config::get_options();
         assert!(res["a"] == "b");
         assert!(res["c"] == "f");
