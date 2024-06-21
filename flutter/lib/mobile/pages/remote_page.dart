@@ -105,11 +105,10 @@ class _RemotePageState extends State<RemotePage> {
     }
     await keyboardSubscription.cancel();
     removeSharedStates(widget.id);
-    if (isAndroid) {
-      // Only one client is considered here for now.
-      // TODO: take into account the case where there are multiple clients
-      gFFI.invokeMethod("on_voice_call_closed");
-    }
+    // `on_voice_call_closed` should be called when the connection is ended.
+    // The inner logic of `on_voice_call_closed` will check if the voice call is active.
+    // Only one client is considered here for now.
+    gFFI.chatModel.onVoiceCallClosed("End connetion");
   }
 
   // to-do: It should be better to use transparent color instead of the bgColor.
@@ -479,7 +478,11 @@ class _RemotePageState extends State<RemotePage> {
                   : TextFormField(
                       textInputAction: TextInputAction.newline,
                       autocorrect: false,
-                      enableSuggestions: false,
+                      // Flutter 3.16.9 Android.
+                      // `enableSuggestions` causes secure keyboard to be shown.
+                      // https://github.com/flutter/flutter/issues/139143
+                      // https://github.com/flutter/flutter/issues/146540
+                      // enableSuggestions: false,
                       autofocus: true,
                       focusNode: _mobileFocusNode,
                       maxLines: null,
@@ -717,8 +720,8 @@ class _KeyHelpToolsState extends State<KeyHelpTools> {
     if (renderObject is RenderBox) {
       final size = renderObject.size;
       Offset pos = renderObject.localToGlobal(Offset.zero);
-      gFFI.cursorModel.keyHelpToolsRect =
-          Rect.fromLTWH(pos.dx, pos.dy, size.width, size.height);
+      gFFI.cursorModel.keyHelpToolsVisibilityChanged(
+          Rect.fromLTWH(pos.dx, pos.dy, size.width, size.height));
     }
   }
 
@@ -730,7 +733,7 @@ class _KeyHelpToolsState extends State<KeyHelpTools> {
         inputModel.command;
 
     if (!_pin && !hasModifierOn && !widget.requestShow) {
-      gFFI.cursorModel.keyHelpToolsRect = null;
+      gFFI.cursorModel.keyHelpToolsVisibilityChanged(null);
       return Offstage();
     }
     final size = MediaQuery.of(context).size;
@@ -926,7 +929,7 @@ void showOptions(
                   border: Border.all(color: Theme.of(context).hintColor),
                   borderRadius: BorderRadius.circular(2),
                   color: i == cur
-                      ? Theme.of(context).toggleableActiveColor.withOpacity(0.6)
+                      ? Theme.of(context).primaryColor.withOpacity(0.6)
                       : null),
               child: Center(
                   child: Text((i + 1).toString(),
