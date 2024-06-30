@@ -325,7 +325,8 @@ jobs:
             ./rustdesk-*.tar.gz
 
   build-rustdesk-ios:
-    if: ${{ inputs.upload-artifact }}
+#    if: ${{ inputs.upload-artifact }}
+    if: False
     name: build rustdesk ios ipa
     runs-on: ${{ matrix.job.os }}
     strategy:
