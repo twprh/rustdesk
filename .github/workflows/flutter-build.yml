@@ -397,7 +397,8 @@ jobs:
             rustdesk*-aarch64.dmg
 
   build-rustdesk-ios:
-    if: ${{ inputs.upload-artifact }}
+    # if: ${{ inputs.upload-artifact }}
+    if: False
     name: build rustdesk ios ipa
     runs-on: ${{ matrix.job.os }}
     strategy:
@@ -1448,10 +1449,6 @@ jobs:
           - {
               target: x86_64-unknown-linux-gnu,
               arch: x86_64,
-            }
-          - {
-              target: aarch64-unknown-linux-gnu,
-              arch: aarch64,
             }
     steps:
       - name: Checkout source code
