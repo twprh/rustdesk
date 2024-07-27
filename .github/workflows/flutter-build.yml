@@ -1329,7 +1329,6 @@ jobs:
             ls -l "${PWD}"
           dockerRunArgs: |
             --volume "${PWD}:/workspace"
-            --volume "/opt/artifacts:/opt/artifacts"
           shell: /bin/bash
           install: |
             apt-get update
@@ -1383,6 +1382,7 @@ jobs:
             fi
             # bootstrap vcpkg and set VCPKG_ROOT
             export VCPKG_ROOT=/opt/artifacts/vcpkg
+            mkdir -p /opt/artifacts
             pushd /opt/artifacts
             rm -rf vcpkg
             git clone https://github.com/microsoft/vcpkg
