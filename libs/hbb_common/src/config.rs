@@ -98,8 +98,8 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SERVERS: &[&str] = &["rustdesk.twp.dedyn.io"];
-pub const PUBLIC_RS_PUB_KEY: &str = "NWtk1Q2r6TwIJiScBMnbIWVIkaGG388Tcsoys7YgrGc=";
+pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
+pub const PUBLIC_RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
 
 pub const RS_PUB_KEY: &str = match option_env!("RS_PUB_KEY") {
     Some(key) if !key.is_empty() => key,
@@ -208,6 +208,8 @@ pub struct Config2 {
     nat_type: i32,
     #[serde(default, deserialize_with = "deserialize_i32")]
     serial: i32,
+    #[serde(default, deserialize_with = "deserialize_string")]
+    unlock_pin: String,
 
     #[serde(default)]
     socks: Option<Socks5Server>,
@@ -427,16 +429,20 @@ fn patch(path: PathBuf) -> PathBuf {
 impl Config2 {
     fn load() -> Config2 {
         let mut config = Config::load_::<Config2>("2");
-        config.options.insert("key".to_string(), RS_PUB_KEY.to_string());
-        config.options.insert("custom-rendezvous-server".to_string(), "rustdesk.twp.dedyn.io".to_string());
+        let mut store = false;
         if let Some(mut socks) = config.socks {
-            let (password, _, store) =
+            let (password, _, store2) =
                 decrypt_str_or_original(&socks.password, PASSWORD_ENC_VERSION);
             socks.password = password;
             config.socks = Some(socks);
-            if store {
-                config.store();
-            }
+            store |= store2;
+        }
+        let (unlock_pin, _, store2) =
+            decrypt_str_or_original(&config.unlock_pin, PASSWORD_ENC_VERSION);
+        config.unlock_pin = unlock_pin;
+        store |= store2;
+        if store {
+            config.store();
         }
         config
     }
@@ -452,6 +458,8 @@ impl Config2 {
                 encrypt_str_or_original(&socks.password, PASSWORD_ENC_VERSION, ENCRYPT_MAX_LEN);
             config.socks = Some(socks);
         }
+        config.unlock_pin =
+            encrypt_str_or_original(&config.unlock_pin, PASSWORD_ENC_VERSION, ENCRYPT_MAX_LEN);
         Config::store_(&config, "2");
     }
 
@@ -1081,6 +1089,19 @@ impl Config {
             return NetworkType::ProxySocks;
         }
         NetworkType::Direct
+    }
+
+    pub fn get_unlock_pin() -> String {
+        CONFIG2.read().unwrap().unlock_pin.clone()
+    }
+
+    pub fn set_unlock_pin(pin: &str) {
+        let mut config = CONFIG2.write().unwrap();
+        if pin == config.unlock_pin {
+            return;
+        }
+        config.unlock_pin = pin.to_string();
+        config.store();
     }
 
     pub fn get() -> Config {
