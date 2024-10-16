@@ -242,10 +242,14 @@ class _RemotePageState extends State<RemotePage> {
     }
   }
 
-  // handle mobile virtual keyboard
-  void handleSoftKeyboardInput(String newValue) {
+  Future<void> handleSoftKeyboardInput(String newValue) async {
     if (isIOS) {
-      _handleIOSSoftKeyboardInput(newValue);
+      // fix: TextFormField onChanged event triggered multiple times when Korean input
+      // https://github.com/rustdesk/rustdesk/pull/9644
+      await Future.delayed(const Duration(milliseconds: 10));
+
+      if (newValue != _textController.text) return;
+      _handleIOSSoftKeyboardInput(_textController.text);
     } else {
       _handleNonIOSSoftKeyboardInput(newValue);
     }
