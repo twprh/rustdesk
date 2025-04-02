@@ -25,6 +25,14 @@
       "platform": "android"
     },
     {
+      "name": "ninja",
+      "host": true
+    },
+    {
+      "name": "ninja",
+      "host": false
+    },
+    {
       "name": "opus",
       "host": true
     },
