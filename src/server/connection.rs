@@ -914,6 +914,11 @@ impl Connection {
                             if !conn.is_remote() {
                                 continue;
                             }
+                            // The CM can send MonitorReady before this connection is authorized.
+                            if !conn.authorized {
+                                log::debug!("Discarding file clipboard message before authorization");
+                                continue;
+                            }
                             match clip {
                                 clipboard::ClipboardFile::Files { files } => {
                                     let files = files.into_iter().map(|(f, s)| {
@@ -3996,6 +4001,17 @@ impl Connection {
                             self.send(msg_out).await;
                         }
                     }
+                    // Only to a connection the cursor service would send the shape to.
+                    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+                    Some(misc::Union::RequestCursorData(id)) => {
+                        if self.is_remote()
+                            && (self.peer_keyboard_enabled() || self.show_remote_cursor)
+                        {
+                            if let Some(msg) = input_service::cursor_data_message(id) {
+                                self.send((*msg).clone()).await;
+                            }
+                        }
+                    }
                     _ => {}
                 },
                 Some(message::Union::AudioFrame(frame)) => {
@@ -6114,6 +6130,10 @@ impl Connection {
 
     #[cfg(feature = "unix-file-copy-paste")]
     async fn handle_file_clip(&mut self, clip: clipboard::ClipboardFile) {
+        if !self.authorized {
+            log::debug!("Discarding file clipboard message before authorization");
+            return;
+        }
         let is_stopping_allowed = clip.is_stopping_allowed();
         let file_transfer_enabled = self.file_transfer_enabled();
         let stop = is_stopping_allowed && !file_transfer_enabled;
