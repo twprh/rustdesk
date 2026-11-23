@@ -532,7 +532,6 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Open in new window", "In einem neuen Fenster öffnen"),
         ("Show displays as individual windows", "Jeden Bildschirm in einem eigenen Fenster anzeigen"),
         ("Use all my displays for the remote session", "Alle meine Bildschirme für die Fernsitzung verwenden"),
-        ("selinux_tip", "SELinux ist auf Ihrem Gerät aktiviert, was dazu führen kann, dass RustDesk als kontrollierte Seite nicht richtig läuft."),
         ("Change view", "Ansicht ändern"),
         ("Big tiles", "Große Kacheln"),
         ("Small tiles", "Kleine Kacheln"),
@@ -827,5 +826,9 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Request approval", "Genehmigung anfordern"),
         ("Forever", "Für immer"),
         ("username-login-disabled-oidc-unavailable", "Die Anmeldung mit Benutzername und Passwort ist deaktiviert, und es sind keine OIDC-Anmeldemethoden verfügbar."),
+        ("Use DRM screen capture", "DRM-Bildschirmaufnahme verwenden"),
+        ("drm-capture-tip", "Nimmt den Bildschirm über den RustDesk-Dienst direkt von der Grafikkarte auf, ohne die Wayland-Abfrage zur Bildschirmfreigabe, auch auf dem Anmeldebildschirm. Funktioniert möglicherweise nicht auf jedem Gerät. Wenn Verbindungen weiterhin eine Bildschirmfreigabe verlangen, deaktivieren Sie dies oder verwenden Sie X11. Eine Änderung trennt die aktuellen Sitzungen."),
+        ("wayland-drm-tip", "Für unbeaufsichtigten Zugriff unter Wayland DRM-Bildschirmaufnahme versuchen, sonst X11 verwenden."),
+        ("login-wayland-drm-tip", "Für den Wayland-Anmeldebildschirm DRM-Bildschirmaufnahme versuchen oder auf X11 umstellen."),
     ].iter().cloned().collect();
 }

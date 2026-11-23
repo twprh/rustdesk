@@ -532,7 +532,6 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Open in new window", "Yeni pencerede aç"),
         ("Show displays as individual windows", "Ekranları ayrı pencereler olarak göster"),
         ("Use all my displays for the remote session", "Uzak oturum için tüm ekranlarımı kullan"),
-        ("selinux_tip", "Cihazınızda SELinux etkin olduğundan, RustDesk'in kontrollü tarafta düzgün çalışmasını engelleyebilir."),
         ("Change view", "Görünümü değiştir"),
         ("Big tiles", "Büyük döşemeler"),
         ("Small tiles", "Küçük döşemeler"),
@@ -827,5 +826,9 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Request approval", "Onay iste"),
         ("Forever", "Sonsuza dek"),
         ("username-login-disabled-oidc-unavailable", "Kullanıcı adı ve parola ile giriş devre dışı bırakılmış ve kullanılabilir OIDC giriş yöntemi yok."),
+        ("Use DRM screen capture", "DRM ekran yakalamayı kullan"),
+        ("drm-capture-tip", "Ekranı RustDesk hizmeti aracılığıyla doğrudan ekran kartından yakalar; giriş ekranı dahil Wayland ekran paylaşımı onayı istenmez. Her cihazda çalışmayabilir; bağlantılar hâlâ ekran paylaşımı istiyorsa bunu kapatın veya X11 kullanın. Bunu değiştirmek mevcut oturumların bağlantısını keser."),
+        ("wayland-drm-tip", "Wayland'de gözetimsiz erişim için DRM ekran yakalamayı deneyin, çalışmazsa X11 kullanın."),
+        ("login-wayland-drm-tip", "Wayland giriş ekranına erişmek için DRM ekran yakalamayı deneyin veya ekranı X11'e geçirin."),
     ].iter().cloned().collect();
 }

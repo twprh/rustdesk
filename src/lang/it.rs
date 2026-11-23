@@ -532,7 +532,6 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Open in new window", "Apri in una nuova finestra"),
         ("Show displays as individual windows", "Visualizza schermi come finestre individuali"),
         ("Use all my displays for the remote session", "Nella sessione remota usa tutti gli schermi"),
-        ("selinux_tip", "In questo dispositivo è abilitato SELinux, che potrebbe impedire il corretto funzionamento di RustDesk come lato controllato."),
         ("Change view", "Modifica vista"),
         ("Big tiles", "Icone grandi"),
         ("Small tiles", "Icone piccole"),
@@ -827,5 +826,9 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Request approval", "Richiedi approvazione"),
         ("Forever", "Per sempre"),
         ("username-login-disabled-oidc-unavailable", "L'accesso con utente e password è disabilitato e non sono disponibili metodi di accesso OIDC."),
+        ("Use DRM screen capture", ""),
+        ("drm-capture-tip", ""),
+        ("wayland-drm-tip", ""),
+        ("login-wayland-drm-tip", ""),
     ].iter().cloned().collect();
 }
